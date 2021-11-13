@@ -4,12 +4,12 @@
     <input-search @searchMovies="search.value = $event"/>
     <div v-if="movies" class="movies-list">
       <div class="movie" v-for="movie in movies" :key="movie.imdbID">
-        <movie 
-        :imdbID="movie.imdbID"
-        :Title="movie.Title"
-        :Poster="movie.Poster"
-        :Type="movie.Type"
-        :Year="movie.Year"
+        <Movie
+          :imdbID="movie.imdbID"
+          :Title="movie.Title"
+          :Poster="movie.Poster"
+          :Type="movie.Type"
+          :Year="movie.Year"
         />
       </div>
     </div>
@@ -19,11 +19,9 @@
 </template>
 
 <script>
-import env from '@/env.js';
 import Movie from '../components/Movie.vue'
 import Banner from '../components/Banner.vue'
 import InputSearch from '../components/InputSearch.vue'
-import axios from "axios";
 
 export default {
   data () {
@@ -31,7 +29,6 @@ export default {
       search: {
         value: ""
       },
-      movies: [],
       options: ['naruto','ball','boruto','teste','love','avengers','batman'],
     }
   },
@@ -45,16 +42,20 @@ export default {
       this.SearchMovies()
     }
   },
+  computed: {
+    movies:{
+      get(){
+        return this.$store.state.movies
+      },
+      set(value){
+        this.$store.dispatch('searchMovies',value)
+      }
+    }
+  },
   methods: {
     SearchMovies() {
       if (this.search.value != ""){
-        axios
-        .get(`http://www.omdbapi.com/?apiKey=${ env.apiKey }&s=${this.search.value}`)
-        .then(response => response.data)
-        .then(data => {
-          console.log(data);
-          this.movies = data.Search;
-        });
+        this.movies = this.search.value
       }
     },
     getRandomItem(arr){
@@ -65,13 +66,7 @@ export default {
   },
   mounted(){
     const search = this.getRandomItem(this.options);
-    axios
-    .get(`http://www.omdbapi.com/?apiKey=${ env.apiKey }&s=${search}`)
-    .then(response => response.data)
-    .then(data => {
-      console.log(data);
-      this.movies = data.Search;
-    });
+    this.$store.dispatch('allMovies',search)
   }
 }
 </script>
