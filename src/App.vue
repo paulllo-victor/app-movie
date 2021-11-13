@@ -5,7 +5,11 @@
     </router-link>
   </header>
   <main>
-    <router-view/>
+    <router-view v-slot="{ Component }">
+      <keep-alive exclude="MovieDetail">
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
   </main>
 </template>
 

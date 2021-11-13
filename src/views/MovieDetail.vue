@@ -22,6 +22,7 @@ import {useRoute} from 'vue-router';
 import env from '@/env.js';
 
 export default {
+    name : "MovieDetail",
     data () {
         return {
             movie: {},
