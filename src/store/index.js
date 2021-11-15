@@ -5,7 +5,8 @@ import env from '@/env.js';
 export default createStore({
     state :{
         movie:{},
-        movies:[]
+        movies:[],
+        numberPages:[],
     },
     mutations:{
         SET_MOVIES(state,payload){
@@ -13,6 +14,13 @@ export default createStore({
         },
         SET_MOVIE(state,payload){
             state.movie = payload
+        },
+        SET_NUMBER_PAGES(state,payload){
+            let pages = 1;
+            if(payload > 10){
+                pages = payload / 10
+            }
+            state.numberPages = Math.round(pages)
         }
     },
     actions:{
@@ -21,6 +29,7 @@ export default createStore({
                 .then(response => response.data)
                 .then(data => {
                     context.commit('SET_MOVIES',data.Search)
+                    context.commit('SET_NUMBER_PAGES',data.totalResults)
                 });
         },
         searchMovies(context,payload){
@@ -28,6 +37,7 @@ export default createStore({
                 .then(response => response.data)
                 .then(data => {
                     context.commit('SET_MOVIES',data.Search)
+                    context.commit('SET_NUMBER_PAGES',data.totalResults)
                 });
         },
         movieDetails(context,payload){
@@ -35,6 +45,14 @@ export default createStore({
                 .then(response => response.data)
                 .then(data => {
                     context.commit('SET_MOVIE',data)
+                });
+        },
+        changePage(context,payload){
+            axios.get(`http://www.omdbapi.com/?apiKey=${env.apiKey}&s=${payload.search}&page=${payload.page}`)
+                .then(response => response.data)
+                .then(data => {
+                    context.commit('SET_MOVIES',data.Search)
+                    context.commit('SET_NUMBER_PAGES',data.totalResults)
                 });
         }
     },

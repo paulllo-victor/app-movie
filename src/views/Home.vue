@@ -2,19 +2,26 @@
   <div class="home">
     <banner/>
     <input-search @searchMovies="search.value = $event"/>
-    <div v-if="movies" class="movies-list">
-      <div class="movie" v-for="movie in movies" :key="movie.imdbID">
-        <Movie
-          :imdbID="movie.imdbID"
-          :Title="movie.Title"
-          :Poster="movie.Poster"
-          :Type="movie.Type"
-          :Year="movie.Year"
-        />
+    <div>
+      <div v-if="movies" class="movies-list">
+        <div class="movie" v-for="movie in movies" :key="movie.imdbID">
+          <Movie
+            :imdbID="movie.imdbID"
+            :Title="movie.Title"
+            :Poster="movie.Poster"
+            :Type="movie.Type"
+            :Year="movie.Year"
+          />
+        </div>
       </div>
+
+      <p v-else class="message">No movie, series or anime found</p>
     </div>
 
-    <p v-else class="message">No movie, series or anime found</p>
+    <div class="container-paginate">
+      <ElementPagination class="page" @click="changePage(page)" v-for="page in pages" :key="page" :page="page"/>
+    </div>
+
   </div>
 </template>
 
@@ -22,6 +29,7 @@
 import Movie from '../components/Movie.vue'
 import Banner from '../components/Banner.vue'
 import InputSearch from '../components/InputSearch.vue'
+import ElementPagination from '../components/ElementPagination.vue'
 
 export default {
   data () {
@@ -35,7 +43,8 @@ export default {
   components: {
     Movie,
     Banner,
-    InputSearch
+    InputSearch,
+    ElementPagination
   },
   watch:{
     'search.value': function(){
@@ -50,6 +59,9 @@ export default {
       set(value){
         this.$store.dispatch('searchMovies',value)
       }
+    },
+    pages(){
+      return this.$store.state.numberPages
     }
   },
   methods: {
@@ -61,7 +73,15 @@ export default {
     getRandomItem(arr){
       const randomIndex = Math.floor(Math.random() * arr.length);
       const item = arr[randomIndex];
+      this.search.value = item;
       return item;
+    },
+    changePage(page){
+      const payload = {
+        search : this.search.value,
+        page
+      };
+      this.$store.dispatch('changePage',payload)
     }
   },
   mounted(){
@@ -90,6 +110,16 @@ export default {
     text-align: center;
     font-weight: bold;
     padding: 20px 0;
+  }
+}
+
+.container-paginate{
+   display: flex;
+   flex-wrap: wrap;
+   margin: 16px 8px ;
+
+  .page{
+    margin: 10px;
   }
 }
 </style>
